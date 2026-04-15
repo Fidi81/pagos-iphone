@@ -137,6 +137,7 @@ body { font-family: -apple-system, "SF Pro Text", sans-serif; background: var(--
     <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
     <span class="month-label" id="monthLabel"></span>
     <button class="nav-btn" onclick="changeMonth(1)">›</button>
+    <button class="nav-btn" onclick="hardRefresh()" title="Actualizar app" style="margin-left:6px;font-size:18px;">↻</button>
   </div>
   <div class="summary">
     <div class="pill">
@@ -374,6 +375,11 @@ document.getElementById('modal').addEventListener('click', function(e) {
 document.getElementById('modalInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') saveModal();
 });
+
+function hardRefresh() {
+  // Fuerza descarga desde el servidor ignorando caché de iOS/Safari
+  location.replace(location.href.split('?')[0] + '?v=' + Date.now());
+}
 
 function showToast(msg) {
   const t = document.getElementById('toast');
