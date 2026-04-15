@@ -195,9 +195,12 @@ const Q2_BASE = [
 
 // Lety: Ene–Jul 2026 → Q1 día 15 $40k | Q2 día 1 $100k
 // Lety: Ago–Dic 2026 → Q1 día 15 $28k | Q2 día 1 $90k
+// Brody: Abr–May 2026 → $20k | Jun–Dic 2026 → $40k | Ene 2027 → $35k
 function getPayments(year, month) {
   let q1 = [...Q1_BASE];
   let q2 = [...Q2_BASE];
+
+  // Lety
   if (year === 2026 && month <= 6) {
     q1 = q1.concat([{ id:"lety-15", name:"Lety", ref:"", day:15, amount:40000.00,  variable:false }]);
     q2 = q2.concat([{ id:"lety-01", name:"Lety", ref:"", day:1,  amount:100000.00, variable:false }]);
@@ -205,6 +208,16 @@ function getPayments(year, month) {
     q1 = q1.concat([{ id:"lety-15", name:"Lety", ref:"", day:15, amount:28000.00, variable:false }]);
     q2 = q2.concat([{ id:"lety-01", name:"Lety", ref:"", day:1,  amount:90000.00, variable:false }]);
   }
+
+  // Brody
+  if (year === 2026 && month >= 3 && month <= 4) {
+    q1 = q1.concat([{ id:"brody-15", name:"Brody", ref:"", day:15, amount:20000.00, variable:false }]);
+  } else if (year === 2026 && month >= 5) {
+    q1 = q1.concat([{ id:"brody-15", name:"Brody", ref:"", day:15, amount:40000.00, variable:false }]);
+  } else if (year === 2027 && month === 0) {
+    q1 = q1.concat([{ id:"brody-15", name:"Brody", ref:"", day:15, amount:35000.00, variable:false }]);
+  }
+
   return { q1, q2 };
 }
 
