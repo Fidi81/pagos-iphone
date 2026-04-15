@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>💳 Pagos</title>
+<style>
+:root {
+  --green:   #1F4E37;
+  --green2:  #2E7D52;
+  --green3:  #C6EFCE;
+  --blue:    #1a56db;
+  --red:     #c00000;
+  --yellow:  #fff3cd;
+  --yellow2: #f59e0b;
+  --paid-bg: #d5f0e0;
+  --paid-txt:#1F4E37;
+  --bg:      #f2f2f7;
+  --card:    #ffffff;
+  --text:    #1c1c1e;
+  --text2:   #6c6c70;
+  --border:  #e5e5ea;
+  --radius:  14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, "SF Pro Text", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 40px; }
+
+/* ── HEADER ── */
+.header {
+  background: var(--green);
+  padding: 52px 20px 16px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.header h1 { color: #fff; font-size: 20px; font-weight: 700; }
+.nav-btn { background: rgba(255,255,255,.15); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.month-label { color: #fff; font-size: 17px; font-weight: 600; text-align: center; flex: 1; }
+
+/* Summary pills */
+.summary { display: flex; gap: 8px; }
+.pill { flex: 1; background: rgba(255,255,255,.12); border-radius: 10px; padding: 8px 6px; text-align: center; }
+.pill-label { font-size: 10px; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: .4px; }
+.pill-value { font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px; }
+.pill-value.paid { color: #7fff9e; }
+.pill-value.pending { color: #ffcc44; }
+
+/* ── CONTENT ── */
+.content { padding: 16px; }
+
+/* Section header */
+.section-hdr {
+  background: var(--green2); color: #fff;
+  font-size: 13px; font-weight: 700; letter-spacing: .3px;
+  padding: 8px 14px; border-radius: 10px 10px 0 0;
+  margin-top: 20px;
+}
+
+/* Card */
+.card { background: var(--card); border-radius: 0 0 var(--radius) var(--radius); overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+/* Payment row */
+.prow {
+  display: flex; align-items: center;
+  padding: 13px 14px; border-bottom: 1px solid var(--border);
+  transition: background .15s; cursor: pointer; user-select: none;
+}
+.prow:last-child { border-bottom: none; }
+.prow.paid { background: var(--paid-bg); }
+.prow:active { background: var(--border); }
+
+.prow-check {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid var(--border); margin-right: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all .2s;
+}
+.prow.paid .prow-check { background: var(--green2); border-color: var(--green2); color: #fff; }
+
+.prow-info { flex: 1; min-width: 0; }
+.prow-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prow.paid .prow-name { color: var(--paid-txt); }
+.prow-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+.prow-right { text-align: right; flex-shrink: 0; margin-left: 10px; }
+.prow-amount { font-size: 15px; font-weight: 700; color: var(--blue); }
+.prow.paid .prow-amount { color: var(--green2); }
+.prow-amount.variable { color: var(--yellow2); font-size: 13px; font-weight: 600; }
+.prow-day { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* Variable amount input modal */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4);
+  z-index: 200; align-items: flex-end;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--card); border-radius: 20px 20px 0 0;
+  padding: 20px 20px 40px; width: 100%;
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.modal p { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+.modal input {
+  width: 100%; font-size: 24px; font-weight: 700; color: var(--blue);
+  border: 2px solid var(--border); border-radius: 12px; padding: 12px 16px;
+  outline: none; text-align: right;
+}
+.modal input:focus { border-color: var(--green2); }
+.modal-btns { display: flex; gap: 10px; margin-top: 14px; }
+.btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
+.btn-cancel { background: var(--bg); color: var(--text2); }
+.btn-save { background: var(--green2); color: #fff; }
+
+/* Empty state */
+.empty { text-align: center; padding: 40px 20px; color: var(--text2); font-size: 14px; }
+
+/* Reset btn */
+.reset-section { margin-top: 24px; text-align: center; }
+.btn-reset { background: none; border: 1px solid var(--border); color: var(--text2); padding: 10px 20px; border-radius: 20px; font-size: 13px; cursor: pointer; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: #fff; padding: 10px 20px; border-radius: 20px;
+  font-size: 14px; opacity: 0; transition: all .3s; pointer-events: none; white-space: nowrap; z-index: 300;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+    <span class="month-label" id="monthLabel"></span>
+    <button class="nav-btn" onclick="changeMonth(1)">›</button>
+  </div>
+  <div class="summary">
+    <div class="pill">
+      <div class="pill-label">Total</div>
+      <div class="pill-value" id="sumTotal">—</div>
+    </div>
+    <div class="pill">
+      <div class="pill-label">Pagado</div>
+      <div class="pill-value paid" id="sumPaid">—</div>
+    </div>
+    <div class="pill">
+      <div class="pill-label">Pendiente</div>
+      <div class="pill-value pending" id="sumPending">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="content" id="content"></div>
+
+<!-- Variable amount modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modalTitle">Ingresar monto</h3>
+    <p id="modalSub">Ingresa el monto a pagar según tu estado de cuenta</p>
+    <input type="number" inputmode="decimal" id="modalInput" placeholder="0.00">
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-save" onclick="saveModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+const Q1_BASE = [
+  { id:"sant-p",   name:"Crédito p. Santander", ref:"#13115416822", day:3,  amount:36326.00, variable:false },
+  { id:"sant-h",   name:"Crédito h. Santander", ref:"#21000750516", day:3,  amount:42122.82, variable:false },
+  { id:"rappi",    name:"RappiCars",             ref:"corte día 15", day:6,  amount:null,     variable:true  },
+  { id:"bbva-inf", name:"BBVA Infinite",         ref:"corte día 20", day:9,  amount:null,     variable:true  },
+  { id:"lalo-15",  name:"Lalo cuñao",            ref:"",             day:15, amount:1266.00,  variable:false },
+  { id:"virtus",   name:"Virtus",                ref:"",             day:15, amount:9300.00,  variable:false },
+  { id:"bnrt-plat",name:"Banorte Platinum 2094", ref:"corte día 25", day:15, amount:null,     variable:true  },
+  { id:"bnrt-inf", name:"Banorte Infinite 6296", ref:"corte día 26", day:15, amount:null,     variable:true  },
+];
+const Q2_BASE = [
+  { id:"bnrt-cam",  name:"Banorte c. Camioneta", ref:"",             day:17, amount:35288.46, variable:false },
+  { id:"amex",      name:"Amex",                 ref:"corte día 11", day:24, amount:null,     variable:true  },
+  { id:"sant-plat", name:"Santander Platino",    ref:"corte día 10", day:30, amount:3654.83,  variable:false },
+  { id:"bnam-hd",   name:"Banamex HomeDepot",    ref:"corte día 10", day:30, amount:6662.42,  variable:false },
+  { id:"bbva-hip",  name:"BBVA Hipotecario",     ref:"",             day:30, amount:21733.98, variable:false },
+  { id:"lalo-30",   name:"Lalo cuñao",           ref:"",             day:30, amount:1266.00,  variable:false },
+];
+
+// Lety: Ene–Jul 2026 → Q1 día 15 $40k | Q2 día 1 $100k
+// Lety: Ago–Dic 2026 → Q1 día 15 $28k | Q2 día 1 $90k
+function getPayments(year, month) {
+  let q1 = [...Q1_BASE];
+  let q2 = [...Q2_BASE];
+  if (year === 2026 && month <= 6) {
+    q1 = q1.concat([{ id:"lety-15", name:"Lety", ref:"", day:15, amount:40000.00,  variable:false }]);
+    q2 = q2.concat([{ id:"lety-01", name:"Lety", ref:"", day:1,  amount:100000.00, variable:false }]);
+  } else if (year === 2026 && month >= 7) {
+    q1 = q1.concat([{ id:"lety-15", name:"Lety", ref:"", day:15, amount:28000.00, variable:false }]);
+    q2 = q2.concat([{ id:"lety-01", name:"Lety", ref:"", day:1,  amount:90000.00, variable:false }]);
+  }
+  return { q1, q2 };
+}
+
+// Keep Q1/Q2 as aliases for current month (populated in render)
+let Q1 = Q1_BASE;
+let Q2 = Q2_BASE;
+
+const now = new Date();
+let curYear  = now.getFullYear();
+let curMonth = now.getMonth(); // 0-indexed
+
+let modalTarget = null;
+
+// ── STORAGE ──
+function stateKey(y, m) { return `pagos_${y}_${m}`; }
+function loadState(y, m) {
+  try { return JSON.parse(localStorage.getItem(stateKey(y, m))) || {}; } catch { return {}; }
+}
+function saveState(y, m, state) {
+  localStorage.setItem(stateKey(y, m), JSON.stringify(state));
+}
+
+// ── FORMAT ──
+function fmt(n) {
+  if (n == null || n === "") return null;
+  return new Intl.NumberFormat('es-MX', { style:'currency', currency:'MXN', minimumFractionDigits:2 }).format(n);
+}
+
+// ── RENDER ──
+function render() {
+  const { q1, q2 } = getPayments(curYear, curMonth);
+  Q1 = q1; Q2 = q2;
+  const state = loadState(curYear, curMonth);
+  const all = [...Q1, ...Q2];
+  document.getElementById('monthLabel').textContent = `${MONTHS[curMonth]} ${curYear}`;
+
+  let totalFixed = 0, totalPaid = 0, totalVar = 0;
+  all.forEach(p => {
+    const amount = state[p.id + '_amount'] ?? p.amount;
+    const paid   = state[p.id + '_paid'] === true;
+    if (amount != null) {
+      totalFixed += Number(amount);
+      if (paid) totalPaid += Number(amount);
+    }
+  });
+  const pending = totalFixed - totalPaid;
+
+  document.getElementById('sumTotal').textContent   = totalFixed ? fmt(totalFixed) : '—';
+  document.getElementById('sumPaid').textContent    = totalPaid  ? fmt(totalPaid)  : '$0';
+  document.getElementById('sumPending').textContent = pending > 0 ? fmt(pending) : '✅';
+
+  const content = document.getElementById('content');
+  content.innerHTML = renderSection('Primera quincena  •  días 1–15', Q1, state)
+                    + renderSection('Segunda quincena  •  días 16–30', Q2, state)
+                    + `<div class="reset-section"><button class="btn-reset" onclick="resetMonth()">🔄 Reiniciar mes</button></div>`;
+}
+
+function renderSection(title, payments, state) {
+  let rows = '';
+  payments.forEach(p => {
+    const paid   = state[p.id + '_paid'] === true;
+    const amount = state[p.id + '_amount'] ?? p.amount;
+    const isVar  = p.variable;
+
+    let amountHtml = '';
+    if (isVar && amount == null) {
+      amountHtml = `<div class="prow-amount variable">📋 Ver edo. cta.</div>`;
+    } else if (amount != null) {
+      amountHtml = `<div class="prow-amount">${fmt(amount)}</div>`;
+    }
+
+    const sub = [p.ref, `día límite ${p.day}`].filter(Boolean).join(' · ');
+    rows += `
+      <div class="prow ${paid ? 'paid' : ''}" onclick="togglePaid('${p.id}', ${isVar})">
+        <div class="prow-check">${paid ? '✓' : ''}</div>
+        <div class="prow-info">
+          <div class="prow-name">${p.name}</div>
+          ${sub ? `<div class="prow-sub">${sub}</div>` : ''}
+        </div>
+        <div class="prow-right">
+          ${amountHtml}
+        </div>
+      </div>`;
+  });
+  return `<div class="section-hdr">${title}</div><div class="card">${rows}</div>`;
+}
+
+// ── INTERACTIONS ──
+function togglePaid(id, isVar) {
+  const state = loadState(curYear, curMonth);
+  const amount = state[id + '_amount'] ?? ([...Q1,...Q2].find(p=>p.id===id)?.amount);
+
+  if (isVar && amount == null) {
+    // Open modal to enter amount first
+    openModal(id);
+    return;
+  }
+
+  state[id + '_paid'] = !state[id + '_paid'];
+  saveState(curYear, curMonth, state);
+  render();
+  showToast(state[id + '_paid'] ? '✓ Marcado como pagado' : 'Desmarcado');
+}
+
+function openModal(id) {
+  const p = [...Q1,...Q2].find(p=>p.id===id);
+  const state = loadState(curYear, curMonth);
+  modalTarget = id;
+  document.getElementById('modalTitle').textContent = p.name;
+  document.getElementById('modalSub').textContent = `${p.ref ? p.ref + ' · ' : ''}Límite día ${p.day}`;
+  document.getElementById('modalInput').value = state[id + '_amount'] || '';
+  document.getElementById('modal').classList.add('show');
+  setTimeout(() => document.getElementById('modalInput').focus(), 300);
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  modalTarget = null;
+}
+
+function saveModal() {
+  if (!modalTarget) return;
+  const val = parseFloat(document.getElementById('modalInput').value);
+  if (!val || val <= 0) { showToast('Ingresa un monto válido'); return; }
+  const state = loadState(curYear, curMonth);
+  state[modalTarget + '_amount'] = val;
+  state[modalTarget + '_paid'] = false;
+  saveState(curYear, curMonth, state);
+  closeModal();
+  render();
+  showToast('✓ Monto guardado');
+}
+
+function changeMonth(dir) {
+  curMonth += dir;
+  if (curMonth > 11) { curMonth = 0; curYear++; }
+  if (curMonth < 0)  { curMonth = 11; curYear--; }
+  render();
+}
+
+function resetMonth() {
+  if (!confirm(`¿Reiniciar todos los pagos de ${MONTHS[curMonth]} ${curYear}?`)) return;
+  localStorage.removeItem(stateKey(curYear, curMonth));
+  render();
+  showToast('Mes reiniciado');
+}
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Enter key in modal
+document.getElementById('modalInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveModal();
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── INIT ──
+render();
+</script>
+</body>
+</html>
