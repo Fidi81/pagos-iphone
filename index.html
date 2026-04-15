@@ -178,22 +178,22 @@ body { font-family: -apple-system, "SF Pro Text", sans-serif; background: var(--
 const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
 const Q1_BASE = [
-  { id:"sant-p",   name:"Crédito p. Santander", ref:"#13115416822", day:3,  amount:36326.00, variable:false },
-  { id:"sant-h",   name:"Crédito h. Santander", ref:"#21000750516", day:3,  amount:42122.82, variable:false },
-  { id:"rappi",    name:"RappiCars",             ref:"corte día 15", day:6,  amount:null,     variable:true  },
-  { id:"bbva-inf", name:"BBVA Infinite",         ref:"corte día 20", day:9,  amount:null,     variable:true  },
-  { id:"lalo-15",  name:"Lalo cuñao",            ref:"",             day:15, amount:1266.00,  variable:false },
-  { id:"virtus",   name:"Virtus",                ref:"",             day:15, amount:9300.00,  variable:false },
-  { id:"bnrt-plat",name:"Banorte Platinum 2094", ref:"corte día 25", day:15, amount:null,     variable:true  },
-  { id:"bnrt-inf", name:"Banorte Infinite 6296", ref:"corte día 26", day:15, amount:null,     variable:true  },
+  { id:"lalo-15",   name:"Lalo cuñao",            ref:"",             day:15, amount:1266.00,  variable:false },
+  { id:"virtus",    name:"Virtus",                 ref:"",             day:15, amount:9300.00,  variable:false },
+  { id:"bnrt-plat", name:"Banorte Platinum 2094",  ref:"corte día 25", day:15, amount:null,     variable:true  },
+  { id:"bnrt-inf",  name:"Banorte Infinite 6296",  ref:"corte día 26", day:15, amount:null,     variable:true  },
+  { id:"bnrt-cam",  name:"Banorte Camioneta",       ref:"",             day:17, amount:35288.46, variable:false },
+  { id:"amex",      name:"Amex",                   ref:"corte día 11", day:24, amount:null,     variable:true  },
 ];
 const Q2_BASE = [
-  { id:"bnrt-cam",  name:"Banorte c. Camioneta", ref:"",             day:17, amount:35288.46, variable:false },
-  { id:"amex",      name:"Amex",                 ref:"corte día 11", day:24, amount:null,     variable:true  },
-  { id:"sant-plat", name:"Santander Platino",    ref:"corte día 10", day:30, amount:3654.83,  variable:false },
-  { id:"bnam-hd",   name:"Banamex HomeDepot",    ref:"corte día 10", day:30, amount:6662.42,  variable:false },
-  { id:"bbva-hip",  name:"BBVA Hipotecario",     ref:"",             day:30, amount:21733.98, variable:false },
-  { id:"lalo-30",   name:"Lalo cuñao",           ref:"",             day:30, amount:1266.00,  variable:false },
+  { id:"sant-p",    name:"Crédito p. Santander",   ref:"#13115416822", day:3,  amount:36326.00,  variable:false },
+  { id:"sant-h",    name:"Crédito h. Santander",   ref:"#21000750516", day:3,  amount:42122.82,  variable:false },
+  { id:"rappi",     name:"RappiCars",               ref:"corte día 15", day:6,  amount:null,      variable:true  },
+  { id:"bbva-inf",  name:"BBVA Infinite",           ref:"corte día 20", day:9,  amount:null,      variable:true  },
+  { id:"sant-plat", name:"Santander Platino",       ref:"corte día 10", day:30, amount:3654.83,   variable:false },
+  { id:"bnam-hd",   name:"Banamex HomeDepot",       ref:"corte día 10", day:30, amount:6662.42,   variable:false },
+  { id:"bbva-hip",  name:"BBVA Hipotecario",        ref:"",             day:30, amount:21733.98,  variable:false },
+  { id:"lalo-30",   name:"Lalo cuñao",              ref:"",             day:30, amount:1266.00,   variable:false },
 ];
 
 // Lety: Ene–Jul 2026 → Q1 día 15 $40k | Q2 día 1 $100k
@@ -273,8 +273,8 @@ function render() {
   document.getElementById('sumPending').textContent = pending > 0 ? fmt(pending) : '✅';
 
   const content = document.getElementById('content');
-  content.innerHTML = renderSection('Primera quincena  •  días 1–15', Q1, state)
-                    + renderSection('Segunda quincena  •  días 16–30', Q2, state)
+  content.innerHTML = renderSection('Ingreso del 15  •  primera quincena', Q1, state)
+                    + renderSection('Ingreso del 1°  •  segunda quincena', Q2, state)
                     + `<div class="reset-section"><button class="btn-reset" onclick="resetMonth()">🔄 Reiniciar mes</button></div>`;
 }
 
