@@ -287,7 +287,9 @@ function renderSection(title, payments, state) {
 
     let amountHtml = '';
     if (isVar && amount == null) {
-      amountHtml = `<div class="prow-amount variable">📋 Ver edo. cta.</div>`;
+      amountHtml = `<div class="prow-amount variable" onclick="event.stopPropagation();openModal('${p.id}')">📋 Ver edo. cta.</div>`;
+    } else if (amount != null && isVar) {
+      amountHtml = `<div class="prow-amount" onclick="event.stopPropagation();openModal('${p.id}')" style="cursor:pointer;">${fmt(amount)}<div style="font-size:9px;color:var(--text2);margin-top:1px;">✏️ editar</div></div>`;
     } else if (amount != null) {
       amountHtml = `<div class="prow-amount">${fmt(amount)}</div>`;
     }
